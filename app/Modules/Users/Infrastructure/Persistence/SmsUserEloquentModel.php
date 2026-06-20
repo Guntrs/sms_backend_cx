@@ -7,11 +7,16 @@ namespace App\Modules\Users\Infrastructure\Persistence;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
 
-// Extiende Authenticatable (no Model) porque este modelo
-// será usado por Laravel Sanctum en Fase 2 para autenticación
 class SmsUserEloquentModel extends Authenticatable
 {
+    use HasApiTokens;
+    use HasRoles;
+    use Notifiable;
+
     protected $table      = 'sms_users';
     protected $primaryKey = 'user_id';
 
@@ -38,7 +43,6 @@ class SmsUserEloquentModel extends Authenticatable
         'modification_date',
     ];
 
-    // Campos que nunca se exponen en respuestas JSON
     protected $hidden = [
         'password',
         'signature',
@@ -52,7 +56,6 @@ class SmsUserEloquentModel extends Authenticatable
         'access_attempt'       => 'integer',
     ];
 
-    // Un usuario pertenece a una persona
     public function person(): BelongsTo
     {
         return $this->belongsTo(
@@ -62,7 +65,6 @@ class SmsUserEloquentModel extends Authenticatable
         );
     }
 
-    // Un usuario puede tener un usuario padre
     public function parentUser(): BelongsTo
     {
         return $this->belongsTo(
@@ -72,7 +74,6 @@ class SmsUserEloquentModel extends Authenticatable
         );
     }
 
-    // Un usuario puede tener sub-usuarios
     public function childUsers(): HasMany
     {
         return $this->hasMany(
@@ -82,7 +83,6 @@ class SmsUserEloquentModel extends Authenticatable
         );
     }
 
-    // Un usuario puede estar asignado a varios establecimientos
     public function establishments(): HasMany
     {
         return $this->hasMany(
