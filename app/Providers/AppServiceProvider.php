@@ -25,6 +25,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app->register(EstablishmentsServiceProvider::class);
         $this->app->register(CustomersServiceProvider::class);
         $this->app->register(ProvidersServiceProvider::class);
+
+        $this->app->register(\App\Modules\Users\Providers\UsersServiceProvider::class);
+
+
     }
 
     public function boot(): void {}

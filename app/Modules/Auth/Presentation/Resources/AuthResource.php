@@ -29,7 +29,8 @@ final class AuthResource extends JsonResource
                 'phone'     => $this->user_phone,
                 'status'    => $this->status,
             ],
-            'token' => $this->token,
+             'token' => $this->token,
+
         ];
     }
 }
