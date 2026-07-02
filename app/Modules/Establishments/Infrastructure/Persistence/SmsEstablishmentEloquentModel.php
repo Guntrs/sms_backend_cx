@@ -1,20 +1,33 @@
 <?php
 
+// Activa el tipado estricto para evitar conversiones automáticas de tipos.
 declare(strict_types=1);
 
+// Define el espacio de nombres donde pertenece el modelo.
 namespace App\Modules\Establishments\Infrastructure\Persistence;
 
+// Importa el modelo base de Eloquent.
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/*
+|--------------------------------------------------------------------------
+| SmsEstablishmentEloquentModel
+|--------------------------------------------------------------------------
+| Modelo Eloquent que representa la tabla sms_establishment
+| y permite interactuar con la base de datos.
+*/
 class SmsEstablishmentEloquentModel extends Model
 {
-    protected $table      = 'sms_establishment';
+    // Define la tabla asociada al modelo.
+    protected $table = 'sms_establishment';
+
+    // Define la clave primaria de la tabla.
     protected $primaryKey = 'establishment_id';
 
+    // Desactiva el manejo automático de created_at y updated_at.
     public $timestamps = false;
 
+    // Define los campos que pueden asignarse masivamente.
     protected $fillable = [
         'establishment_key',
         'parent_establishment_id',
@@ -31,40 +44,4 @@ class SmsEstablishmentEloquentModel extends Model
         'modified_by',
         'modification_date',
     ];
-
-    protected $casts = [
-        'creation_date'     => 'datetime',
-        'modification_date' => 'datetime',
-        'status'            => 'integer',
-    ];
-
-    // Un establecimiento puede tener sub-establecimientos
-    public function children(): HasMany
-    {
-        return $this->hasMany(
-            SmsEstablishmentEloquentModel::class,
-            'parent_establishment_id',
-            'establishment_id'
-        );
-    }
-
-    // Un establecimiento puede tener un padre
-    public function parent(): BelongsTo
-    {
-        return $this->belongsTo(
-            SmsEstablishmentEloquentModel::class,
-            'parent_establishment_id',
-            'establishment_id'
-        );
-    }
-
-    // Un establecimiento tiene muchos usuarios asignados
-    public function usersEstablishment(): HasMany
-    {
-        return $this->hasMany(
-            SmsUserEstablishmentEloquentModel::class,
-            'establishment_id',
-            'establishment_id'
-        );
-    }
 }

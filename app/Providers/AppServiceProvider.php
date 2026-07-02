@@ -27,7 +27,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->register(ProvidersServiceProvider::class);
 
         $this->app->register(\App\Modules\Users\Providers\UsersServiceProvider::class);
-
+        $this->app->register(\App\Modules\Establishments\Providers\EstablishmentsServiceProvider::class);
 
     }
 
