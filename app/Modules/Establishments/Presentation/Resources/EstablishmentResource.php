@@ -1,38 +1,37 @@
 <?php
 
-// Activa el tipado estricto para evitar conversiones automáticas de tipos.
 declare(strict_types=1);
 
-// Define el espacio de nombres donde pertenece este Resource.
 namespace App\Modules\Establishments\Presentation\Resources;
 
-// Importa la clase Request de Laravel.
 use Illuminate\Http\Request;
-
-// Importa la clase base JsonResource de Laravel.
 use Illuminate\Http\Resources\Json\JsonResource;
 
-/*
-|--------------------------------------------------------------------------
-| EstablishmentResource
-|--------------------------------------------------------------------------
-| Resource encargado de transformar una entidad Establishment
-| en un arreglo que será devuelto como respuesta JSON.
-*/
+/**
+ * Transforma una entidad de establecimiento
+ * en la estructura JSON que será enviada
+ * como respuesta de la API.
+ *
+ * Su responsabilidad es definir únicamente
+ * el formato de salida de los datos.
+ */
 final class EstablishmentResource extends JsonResource
 {
-    // Convierte la entidad en un arreglo para la respuesta de la API.
+    /**
+     * Convierte la entidad del dominio en un arreglo
+     * listo para serializar como respuesta JSON.
+     */
     public function toArray(Request $request): array
     {
         return [
 
-            // ID del establecimiento.
+            // Identificador del establecimiento.
             'establishment_id' => $this->establishmentId,
 
-            // Identificador único del establecimiento.
+            // Clave única del establecimiento.
             'establishment_key' => $this->establishmentKey,
 
-            // ID del establecimiento padre.
+            // Identificador del establecimiento padre.
             'parent_establishment_id' => $this->parentEstablishmentId,
 
             // Nombre del establecimiento.
@@ -47,17 +46,25 @@ final class EstablishmentResource extends JsonResource
             // Dirección del establecimiento.
             'establishment_address' => $this->establishmentAddress,
 
-            // Correo electrónico del establecimiento.
+            // Correo electrónico.
             'establishment_email' => $this->establishmentEmail,
 
-            // Teléfono del establecimiento.
+            // Teléfono de contacto.
             'establishment_phone' => $this->establishmentPhone,
 
-            // Tipo de establecimiento.
-            'establishment_type' => $this->establishmentType,
+            // Tipo de establecimiento:
+            // identificador + nombre descriptivo.
+            'establishment_type' => [
+                'id'   => $this->establishmentType,
+                'name' => $this->establishmentTypeName,
+            ],
 
-            // Estado del establecimiento.
-            'status' => $this->status,
+            // Estado del establecimiento:
+            // identificador + nombre descriptivo.
+            'status' => [
+                'id'   => $this->status,
+                'name' => $this->statusName,
+            ],
 
             // Usuario que creó el registro.
             'created_by' => $this->createdBy,

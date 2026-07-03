@@ -1,82 +1,96 @@
 <?php
 
+// Activa el tipado estricto para evitar conversiones automáticas de tipos.
 declare(strict_types=1);
 
+// Define el espacio de nombres donde pertenece este caso de uso.
 namespace App\Modules\Users\Application\UseCases;
 
+// Importa el DTO con los datos necesarios para actualizar un usuario.
 use App\Modules\Users\Application\DTOs\UpdateUserDTO;
+
+// Importa el contrato del repositorio para acceder a los datos.
 use App\Modules\Users\Domain\Contracts\UserRepositoryInterface;
+
+// Importa la entidad que será devuelta tras la actualización.
 use App\Modules\Users\Domain\Entities\User;
+
+// Importa las excepciones de la lógica de negocio.
+use App\Modules\Users\Domain\Exceptions\InvalidUserStatusException;
 use App\Modules\Users\Domain\Exceptions\UserNotFoundException;
+
+// Importa la regla de negocio con los estados permitidos.
+use App\Modules\Users\Domain\Rules\UserStatus;
+
+// Importa Hash para cifrar la contraseña.
 use Illuminate\Support\Facades\Hash;
 
-/**
- * Caso de uso para la actualización de usuarios.
- *
- * Contiene la lógica de negocio necesaria para actualizar
- * un usuario existente, coordinando las reglas del dominio
- * y el acceso al repositorio.
- */
+/*
+|--------------------------------------------------------------------------
+| UpdateUserUseCase
+|--------------------------------------------------------------------------
+| Caso de uso encargado de ejecutar la lógica de negocio para
+| actualizar un usuario existente.
+*/
 final class UpdateUserUseCase
 {
-    /**
-     * Inicializa el caso de uso con el repositorio de usuarios.
-     *
-     * @param UserRepositoryInterface $userRepository Repositorio encargado
-     * de consultar y persistir usuarios.
-     */
+    // Inyecta el repositorio mediante su interfaz.
     public function __construct(
         private readonly UserRepositoryInterface $userRepository
     ) {}
 
-    /**
-     * Ejecuta el proceso de actualización de un usuario.
-     *
-     * Flujo:
-     * 1. Verifica que el usuario exista.
-     * 2. Si no existe, lanza una excepción de dominio.
-     * 3. Construye únicamente los campos que serán actualizados.
-     * 4. Encripta la contraseña si fue proporcionada.
-     * 5. Solicita al repositorio actualizar el usuario.
-     *
-     * @param int $id Identificador del usuario.
-     * @param UpdateUserDTO $dto Datos necesarios para actualizar el usuario.
-     *
-     * @return User Entidad del usuario actualizada.
-     *
-     * @throws UserNotFoundException Si el usuario no existe.
-     */
+    // Ejecuta el proceso de actualización del usuario.
     public function execute(int $id, UpdateUserDTO $dto): User
     {
-        // Verifica que el usuario exista.
+        // Busca el usuario por su ID.
         $existing = $this->userRepository->findById($id);
 
-        // Si no existe, se detiene el proceso lanzando una excepción.
+        // Si no existe, detiene el proceso lanzando una excepción.
         if ($existing === null) {
             throw new UserNotFoundException($id);
         }
 
-        // Construye el arreglo únicamente con los campos enviados.
+        // Verifica que el estado enviado sea uno de los permitidos.
+        if ($dto->status !== null && !in_array($dto->status, UserStatus::values(), true)) {
+            throw new InvalidUserStatusException($dto->status);
+        }
+
+        // Construye el arreglo con los datos a actualizar.
+        // Solo conserva los campos cuyo valor no sea null.
         $data = array_filter([
-            'user_full_name'      => $dto->userFullName,
-            'user_email'          => $dto->userEmail,
-            'user_phone'          => $dto->userPhone,
+
+            // Nombre completo del usuario.
+            'user_full_name' => $dto->userFullName,
+
+            // Correo electrónico.
+            'user_email' => $dto->userEmail,
+
+            // Teléfono.
+            'user_phone' => $dto->userPhone,
+
+            // Número profesional.
             'professional_number' => $dto->professionalNumber,
-            'signature'           => $dto->signature,
-            'image_url'           => $dto->imageUrl,
-            'status'              => $dto->status,
-            'modified_by'         => $dto->modifiedBy,
 
-            // Encripta la contraseña únicamente si fue enviada.
-            'password'            => $dto->password !== null
-                                        ? Hash::make($dto->password)
-                                        : null,
+            // Firma.
+            'signature' => $dto->signature,
 
-        // Elimina los campos con valor null para evitar
-        // actualizar columnas que no fueron enviadas.
+            // URL de la imagen.
+            'image_url' => $dto->imageUrl,
+
+            // Estado del usuario.
+            'status' => $dto->status,
+
+            // Usuario que realiza la modificación.
+            'modified_by' => $dto->modifiedBy,
+
+            // Cifra la contraseña antes de almacenarla si fue enviada.
+            'password' => $dto->password !== null
+                ? Hash::make($dto->password)
+                : null,
+
         ], fn($v) => $v !== null);
 
-        // Solicita al repositorio actualizar el usuario.
+        // Actualiza el usuario y devuelve la entidad actualizada.
         return $this->userRepository->update($id, $data);
     }
 }

@@ -1,92 +1,89 @@
 <?php
 
-// Activa el tipado estricto para evitar conversiones automáticas de tipos.
 declare(strict_types=1);
 
-// Define el espacio de nombres donde pertenece este DTO.
 namespace App\Modules\Establishments\Application\DTOs;
 
-// Importa la clase Request de Laravel.
 use Illuminate\Http\Request;
 
-/*
-|--------------------------------------------------------------------------
-| UpdateEstablishmentDTO
-|--------------------------------------------------------------------------
-| DTO que encapsula los datos necesarios para actualizar un establecimiento.
-*/
+/**
+ * DTO que transporta los datos necesarios para
+ * actualizar un establecimiento.
+ *
+ * Su responsabilidad es desacoplar la lógica de
+ * negocio del objeto Request de Laravel y transportar
+ * únicamente la información validada.
+ */
 final class UpdateEstablishmentDTO
 {
-    // Constructor que inicializa las propiedades del DTO.
+    /**
+     * Crea una instancia inmutable con los datos
+     * que serán utilizados durante la actualización.
+     */
     public function __construct(
-        // Nombre del establecimiento (opcional).
-        public readonly ?string $establishmentName        = null,
 
-        // ID del establecimiento padre (opcional).
-        public readonly ?int    $parentEstablishmentId    = null,
+        // Nombre del establecimiento.
+        public readonly ?string $establishmentName = null,
 
-        // NIT del establecimiento (opcional).
-        public readonly ?string $establishmentNit         = null,
+        // Establecimiento padre.
+        public readonly ?int $parentEstablishmentId = null,
 
-        // Descripción del establecimiento (opcional).
+        // NIT del establecimiento.
+        public readonly ?string $establishmentNit = null,
+
+        // Descripción del establecimiento.
         public readonly ?string $establishmentDescription = null,
 
-        // Dirección del establecimiento (opcional).
-        public readonly ?string $establishmentAddress     = null,
+        // Dirección del establecimiento.
+        public readonly ?string $establishmentAddress = null,
 
-        // Correo electrónico del establecimiento (opcional).
-        public readonly ?string $establishmentEmail       = null,
+        // Correo electrónico del establecimiento.
+        public readonly ?string $establishmentEmail = null,
 
-        // Teléfono del establecimiento (opcional).
-        public readonly ?string $establishmentPhone       = null,
+        // Teléfono del establecimiento.
+        public readonly ?string $establishmentPhone = null,
 
-        // Tipo de establecimiento (opcional).
-        public readonly ?string $establishmentType        = null,
+        // Tipo de establecimiento (typology_id del catálogo de sectores).
+        public readonly ?int $establishmentType = null,
 
-        // Estado del establecimiento (opcional).
-        public readonly ?int    $status                   = null,
+        // Estado del establecimiento.
+        public readonly ?int $status = null,
 
         // Usuario que realiza la modificación.
-        public readonly ?int    $modifiedBy               = null,
+        public readonly ?int $modifiedBy = null,
     ) {}
 
-    /*
-     * Crea una instancia del DTO utilizando únicamente
-     * los datos validados provenientes del FormRequest.
+    /**
+     * Construye el DTO a partir de una petición validada.
+     *
+     * Extrae únicamente los datos permitidos y realiza
+     * las conversiones de tipo necesarias antes de
+     * enviarlos a la capa de Aplicación.
      */
     public static function fromRequest(Request $request): self
     {
         return new self(
-            // Obtiene el nombre validado.
             establishmentName:        $request->validated('establishment_name'),
-
-            // Obtiene el establecimiento padre validado.
             parentEstablishmentId:    $request->validated('parent_establishment_id'),
-
-            // Obtiene el NIT validado.
             establishmentNit:         $request->validated('establishment_nit'),
-
-            // Obtiene la descripción validada.
             establishmentDescription: $request->validated('establishment_description'),
-
-            // Obtiene la dirección validada.
             establishmentAddress:     $request->validated('establishment_address'),
-
-            // Obtiene el correo validado.
             establishmentEmail:       $request->validated('establishment_email'),
-
-            // Obtiene el teléfono validado.
             establishmentPhone:       $request->validated('establishment_phone'),
 
-            // Obtiene el tipo validado.
-            establishmentType:        $request->validated('establishment_type'),
+            // Convierte el tipo de establecimiento a entero
+            // únicamente si fue enviado.
+            establishmentType:        $request->validated('establishment_type') !== null
+                                          ? (int) $request->validated('establishment_type')
+                                          : null,
 
-            // Convierte el estado a entero si fue enviado; de lo contrario mantiene null.
+            // Convierte el estado a entero
+            // únicamente si fue enviado.
             status:                   $request->validated('status') !== null
                                           ? (int) $request->validated('status')
                                           : null,
 
-            // Obtiene el ID del usuario autenticado que realiza la modificación.
+            // Obtiene el identificador del usuario autenticado.
             modifiedBy:               $request->user()?->user_id,
         );
     }

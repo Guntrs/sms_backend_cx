@@ -62,7 +62,10 @@ final class UserResource extends JsonResource
             'image_url' => $this->imageUrl,
 
             // Estado.
-            'status' => $this->status,
+            'status' => [
+                'id'   => $this->status,
+                'name' => $this->statusName,
+            ],
 
             // Usuario que creó el registro.
             'created_by' => $this->createdBy,

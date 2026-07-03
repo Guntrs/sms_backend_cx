@@ -6,7 +6,7 @@ namespace App\Modules\Users\Presentation\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-
+use App\Modules\Users\Domain\Rules\UserStatus;
 /**
  * Request para la actualización de usuarios.
  *
@@ -93,11 +93,11 @@ final class UpdateUserRequest extends FormRequest
                 'max:500',
             ],
 
-            // Estado del usuario.
+            // Estado del usuario: solo Activo (501), Inactivo (502) o Suspendido (503).
             'status' => [
                 'nullable',
                 'integer',
-                'in:0,1',
+                Rule::in(UserStatus::values()),
             ],
 
             // Nueva contraseña.

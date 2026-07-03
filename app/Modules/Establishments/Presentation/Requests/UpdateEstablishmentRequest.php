@@ -1,42 +1,51 @@
 <?php
 
-// Activa el tipado estricto para evitar conversiones automáticas de tipos.
 declare(strict_types=1);
 
-// Define el espacio de nombres donde pertenece este FormRequest.
 namespace App\Modules\Establishments\Presentation\Requests;
 
-// Importa la clase base FormRequest de Laravel.
+use App\Modules\Establishments\Domain\Rules\EstablishmentStatus;
+use App\Modules\Establishments\Domain\Rules\EstablishmentType;
 use Illuminate\Foundation\Http\FormRequest;
-
-// Importa la clase Rule para crear reglas de validación avanzadas.
 use Illuminate\Validation\Rule;
 
-/*
-|--------------------------------------------------------------------------
-| UpdateEstablishmentRequest
-|--------------------------------------------------------------------------
-| FormRequest encargado de autorizar y validar los datos recibidos
-| para actualizar un establecimiento.
-*/
+/**
+ * Valida los datos recibidos para actualizar
+ * un establecimiento existente.
+ *
+ * Su responsabilidad es garantizar que únicamente
+ * se acepten datos válidos antes de ejecutar
+ * la lógica de negocio.
+ */
 final class UpdateEstablishmentRequest extends FormRequest
 {
-    // Autoriza la ejecución de la solicitud.
+    /**
+     * Determina si el usuario puede realizar
+     * esta petición.
+     *
+     * La autorización se delega a otra capa
+     * (Policies o Middleware).
+     */
     public function authorize(): bool
     {
         return true;
     }
 
-    // Define las reglas de validación.
+    /**
+     * Define las reglas de validación para
+     * la actualización de un establecimiento.
+     */
     public function rules(): array
     {
-        // Obtiene el ID del establecimiento desde la ruta.
+        // Obtiene el identificador del establecimiento
+        // desde el parámetro de la ruta.
         $establishmentId = $this->route('establishment');
 
         return [
 
-            // Nombre opcional, máximo 200 caracteres y único,
-            // ignorando el registro que se está actualizando.
+            // Nombre opcional.
+            // Si se envía, debe ser único excluyendo
+            // el propio registro que se está actualizando.
             'establishment_name' => [
                 'nullable',
                 'string',
@@ -45,15 +54,17 @@ final class UpdateEstablishmentRequest extends FormRequest
                     ->ignore($establishmentId, 'establishment_id')
             ],
 
-            // ID del establecimiento padre opcional y debe existir.
+            // Establecimiento padre opcional.
+            // Si se envía, debe existir.
             'parent_establishment_id' => [
                 'nullable',
                 'integer',
                 'exists:sms_establishment,establishment_id'
             ],
 
-            // NIT opcional, máximo 50 caracteres y único,
-            // ignorando el registro que se está actualizando.
+            // NIT opcional.
+            // Si se envía, debe ser único excepto
+            // para el registro actual.
             'establishment_nit' => [
                 'nullable',
                 'string',
@@ -68,21 +79,22 @@ final class UpdateEstablishmentRequest extends FormRequest
                 'string'
             ],
 
-            // Dirección opcional con máximo 300 caracteres.
+            // Dirección opcional.
             'establishment_address' => [
                 'nullable',
                 'string',
                 'max:300'
             ],
 
-            // Correo electrónico opcional con formato válido.
+            // Correo electrónico opcional
+            // con formato válido.
             'establishment_email' => [
                 'nullable',
                 'email',
                 'max:150'
             ],
 
-            // Teléfono opcional con máximo 20 caracteres.
+            // Teléfono opcional.
             'establishment_phone' => [
                 'nullable',
                 'string',
@@ -90,17 +102,21 @@ final class UpdateEstablishmentRequest extends FormRequest
             ],
 
             // Tipo de establecimiento opcional.
+            // Si se envía, debe pertenecer al conjunto
+            // de tipos válidos del dominio.
             'establishment_type' => [
                 'nullable',
-                'string',
-                'max:50'
+                'integer',
+                Rule::in(EstablishmentType::values()),
             ],
 
-            // Estado opcional; solo permite 0 o 1.
+            // Estado opcional.
+            // Si se envía, debe ser uno de los estados
+            // permitidos por las reglas del dominio.
             'status' => [
                 'nullable',
                 'integer',
-                'in:0,1'
+                Rule::in(EstablishmentStatus::values()),
             ],
         ];
     }

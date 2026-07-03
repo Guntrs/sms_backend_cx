@@ -51,8 +51,8 @@ final class CreateUserDTO
         /** URL de la imagen del usuario. */
         public readonly ?string $imageUrl = null,
 
-        /** Estado inicial del usuario. */
-        public readonly int $status = 1,
+        /** Estado inicial del usuario. Siempre nace Activo (501). */
+        public readonly int $status = \App\Modules\Users\Domain\Rules\UserStatus::ACTIVO,
 
         /** Usuario que realiza la creación del registro. */
         public readonly ?int $createdBy = null,
@@ -82,7 +82,7 @@ final class CreateUserDTO
             professionalNumber: $request->validated('professional_number'),
             signature:          $request->validated('signature'),
             imageUrl:           $request->validated('image_url'),
-            status:             (int) ($request->validated('status') ?? 1),
+            status: \App\Modules\Users\Domain\Rules\UserStatus::ACTIVO,
             createdBy:          $request->user()?->user_id,
         );
     }

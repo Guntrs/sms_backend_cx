@@ -1,35 +1,43 @@
 <?php
 
-// Activa el tipado estricto para evitar conversiones automáticas de tipos.
 declare(strict_types=1);
 
-// Define el espacio de nombres donde pertenece este FormRequest.
 namespace App\Modules\Establishments\Presentation\Requests;
 
-// Importa la clase base FormRequest de Laravel.
+use App\Modules\Establishments\Domain\Rules\EstablishmentType;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
-/*
-|--------------------------------------------------------------------------
-| CreateEstablishmentRequest
-|--------------------------------------------------------------------------
-| FormRequest encargado de autorizar y validar los datos recibidos
-| para crear un establecimiento.
-*/
+/**
+ * Valida los datos recibidos para crear un establecimiento.
+ *
+ * Su responsabilidad es garantizar que la información enviada
+ * por el cliente cumpla las reglas básicas de formato, longitud,
+ * unicidad e integridad antes de llegar a la lógica de negocio.
+ */
 final class CreateEstablishmentRequest extends FormRequest
 {
-    // Autoriza la ejecución de la solicitud.
+    /**
+     * Determina si el usuario puede realizar esta petición.
+     *
+     * La autorización se delega a otra capa (por ejemplo, Policies
+     * o Middleware), por lo que aquí siempre se permite.
+     */
     public function authorize(): bool
     {
         return true;
     }
 
-    // Define las reglas de validación de cada campo.
+    /**
+     * Define las reglas de validación para la creación
+     * de un establecimiento.
+     */
     public function rules(): array
     {
         return [
 
-            // Nombre obligatorio, máximo 200 caracteres y único.
+            // Nombre obligatorio, texto, longitud máxima
+            // y único dentro de la tabla.
             'establishment_name' => [
                 'required',
                 'string',
@@ -37,14 +45,16 @@ final class CreateEstablishmentRequest extends FormRequest
                 'unique:sms_establishment,establishment_name'
             ],
 
-            // ID del establecimiento padre opcional y debe existir.
+            // Establecimiento padre opcional.
+            // Si se envía, debe existir en la base de datos.
             'parent_establishment_id' => [
                 'nullable',
                 'integer',
                 'exists:sms_establishment,establishment_id'
             ],
 
-            // NIT opcional, máximo 50 caracteres y único.
+            // NIT opcional, con longitud máxima
+            // y sin duplicados.
             'establishment_nit' => [
                 'nullable',
                 'string',
@@ -58,7 +68,7 @@ final class CreateEstablishmentRequest extends FormRequest
                 'string'
             ],
 
-            // Dirección opcional con máximo 300 caracteres.
+            // Dirección opcional con longitud máxima.
             'establishment_address' => [
                 'nullable',
                 'string',
@@ -72,26 +82,24 @@ final class CreateEstablishmentRequest extends FormRequest
                 'max:150'
             ],
 
-            // Teléfono opcional con máximo 20 caracteres.
+            // Teléfono opcional con longitud máxima.
             'establishment_phone' => [
                 'nullable',
                 'string',
                 'max:20'
             ],
 
-            // Tipo de establecimiento opcional.
+            // Tipo de establecimiento obligatorio.
+            // Debe pertenecer al conjunto de tipos permitidos
+            // definido por las reglas del dominio.
             'establishment_type' => [
-                'nullable',
-                'string',
-                'max:50'
+                'required',
+                'integer',
+                Rule::in(EstablishmentType::values()),
             ],
 
-            // Estado opcional; solo permite 0 o 1.
-            'status' => [
-                'nullable',
-                'integer',
-                'in:0,1'
-            ],
+            // El estado no se recibe desde el cliente.
+            // Se asigna automáticamente por la lógica del dominio.
         ];
     }
 }

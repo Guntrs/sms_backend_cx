@@ -12,19 +12,23 @@ final class UserEloquentRepository implements UserRepositoryInterface
 {
     public function findById(int $id): ?User
     {
-        $model = SmsUserEloquentModel::find($id);
+        $model = SmsUserEloquentModel::with('statusTypology')->find($id);
         return $model ? $this->toDomain($model) : null;
     }
 
     public function findByUserName(string $userName): ?User
     {
-        $model = SmsUserEloquentModel::where('user_name', $userName)->first();
+        $model = SmsUserEloquentModel::with('statusTypology')
+            ->where('user_name', $userName)
+            ->first();
         return $model ? $this->toDomain($model) : null;
     }
 
     public function findByEmail(string $email): ?User
     {
-        $model = SmsUserEloquentModel::where('user_email', $email)->first();
+        $model = SmsUserEloquentModel::with('statusTypology')
+            ->where('user_email', $email)
+            ->first();
         return $model ? $this->toDomain($model) : null;
     }
 
@@ -33,6 +37,7 @@ final class UserEloquentRepository implements UserRepositoryInterface
         $data['user_key']      = (string) \Illuminate\Support\Str::uuid();
         $data['creation_date'] = now()->toDateTimeString();
         $model                 = SmsUserEloquentModel::create($data);
+        $model->load('statusTypology');
         return $this->toDomain($model);
     }
 
@@ -41,7 +46,7 @@ final class UserEloquentRepository implements UserRepositoryInterface
         $data['modification_date'] = now()->toDateTimeString();
         $model                     = SmsUserEloquentModel::findOrFail($id);
         $model->update($data);
-        return $this->toDomain($model->fresh());
+        return $this->toDomain($model->fresh('statusTypology'));
     }
 
     public function delete(int $id): bool
@@ -51,7 +56,8 @@ final class UserEloquentRepository implements UserRepositoryInterface
 
     public function paginate(int $perPage = 15): mixed
     {
-        return SmsUserEloquentModel::orderBy('user_id')
+        return SmsUserEloquentModel::with('statusTypology')
+            ->orderBy('user_id')
             ->paginate($perPage)
             ->through(fn($model) => $this->toDomain($model));
     }
@@ -71,6 +77,7 @@ final class UserEloquentRepository implements UserRepositoryInterface
             signature:          $model->signature,
             imageUrl:           $model->image_url,
             status:             $model->status,
+            statusName:         $model->statusTypology?->description,
             createdBy:          $model->created_by,
             creationDate:       $model->creation_date?->toDateTimeString(),
             modifiedBy:         $model->modified_by,

@@ -12,6 +12,7 @@ use App\Modules\Users\Application\UseCases\DeleteUserUseCase;
 use App\Modules\Users\Application\UseCases\GetUserUseCase;
 use App\Modules\Users\Application\UseCases\ListUsersUseCase;
 use App\Modules\Users\Application\UseCases\UpdateUserUseCase;
+use App\Modules\Users\Domain\Exceptions\InvalidUserStatusException;
 use App\Modules\Users\Domain\Exceptions\UserAlreadyExistsException;
 use App\Modules\Users\Domain\Exceptions\UserNotFoundException;
 use App\Modules\Users\Presentation\Requests\CreateUserRequest;
@@ -170,6 +171,15 @@ final class UserController extends BaseController
             return $this->errorResponse(
                 $e->getMessage(),
                 404
+            );
+
+        } catch (InvalidUserStatusException $e) {
+
+            // Devuelve un error si el status enviado no es válido
+            // (solo se permiten 501 Activo, 502 Inactivo, 503 Suspendido).
+            return $this->errorResponse(
+                $e->getMessage(),
+                422
             );
         }
     }

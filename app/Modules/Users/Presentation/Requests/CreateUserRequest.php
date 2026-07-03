@@ -111,12 +111,7 @@ final class CreateUserRequest extends FormRequest
                 'max:500',
             ],
 
-            // Estado del usuario.
-            'status' => [
-                'nullable',
-                'integer',
-                'in:0,1',
-            ],
+
         ];
     }
 }

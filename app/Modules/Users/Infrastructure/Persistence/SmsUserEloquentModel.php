@@ -91,4 +91,13 @@ class SmsUserEloquentModel extends Authenticatable
             'user_id'
         );
     }
+
+    public function statusTypology(): BelongsTo
+    {
+        return $this->belongsTo(
+            \App\Modules\Typologies\Infrastructure\Persistence\SmsTypologyEloquentModel::class,
+            'status',
+            'typology_id'
+        );
+    }
 }

@@ -1,29 +1,34 @@
 <?php
 
-// Activa el tipado estricto para evitar conversiones automáticas de tipos.
 declare(strict_types=1);
 
-// Define el espacio de nombres donde pertenece este DTO.
 namespace App\Modules\Establishments\Application\DTOs;
 
-// Importa la clase Request de Laravel.
+use App\Modules\Establishments\Domain\Rules\EstablishmentStatus;
 use Illuminate\Http\Request;
 
-/*
-|--------------------------------------------------------------------------
-| CreateEstablishmentDTO
-|--------------------------------------------------------------------------
-| DTO (Data Transfer Object) que encapsula y transporta de forma inmutable
-| los datos necesarios para crear un establecimiento entre capas de la aplicación.
-*/
+/**
+ * DTO que transporta los datos necesarios para crear
+ * un establecimiento desde la capa de Presentación
+ * hacia la capa de Aplicación.
+ *
+ * Su objetivo es desacoplar la lógica de negocio del
+ * objeto Request de Laravel.
+ */
 final class CreateEstablishmentDTO
 {
-    // Constructor que inicializa todas las propiedades del DTO.
+    /**
+     * Crea una instancia inmutable con la información
+     * necesaria para registrar un establecimiento.
+     */
     public function __construct(
-        // Nombre del establecimiento (obligatorio).
+        // Nombre del establecimiento.
         public readonly string  $establishmentName,
 
-        // ID del establecimiento padre (opcional).
+        // Tipo de establecimiento (typology_id del catálogo de sectores).
+        public readonly int     $establishmentType,
+
+        // Establecimiento padre (opcional).
         public readonly ?int    $parentEstablishmentId    = null,
 
         // NIT del establecimiento (opcional).
@@ -41,51 +46,37 @@ final class CreateEstablishmentDTO
         // Teléfono del establecimiento (opcional).
         public readonly ?string $establishmentPhone       = null,
 
-        // Tipo de establecimiento (opcional).
-        public readonly ?string $establishmentType        = null,
+        // Estado inicial del establecimiento.
+        // Siempre se crea como Activo y no proviene del cliente.
+        public readonly int     $status                   = EstablishmentStatus::ACTIVO,
 
-        // Estado inicial del establecimiento (activo por defecto).
-        public readonly int     $status                   = 1,
-
-        // Usuario que crea el registro (opcional).
+        // Usuario que realiza la creación (opcional).
         public readonly ?int    $createdBy                = null,
     ) {}
 
-    /*
-     * Crea una instancia del DTO utilizando únicamente
-     * los datos validados provenientes del FormRequest.
+    /**
+     * Construye el DTO a partir de una petición validada.
+     *
+     * Extrae únicamente los datos permitidos y asigna
+     * automáticamente los valores controlados por
+     * las reglas de negocio.
      */
     public static function fromRequest(Request $request): self
     {
         return new self(
-            // Obtiene el nombre validado.
             establishmentName:        $request->validated('establishment_name'),
-
-            // Obtiene el establecimiento padre validado.
+            establishmentType:        (int) $request->validated('establishment_type'),
             parentEstablishmentId:    $request->validated('parent_establishment_id'),
-
-            // Obtiene el NIT validado.
             establishmentNit:         $request->validated('establishment_nit'),
-
-            // Obtiene la descripción validada.
             establishmentDescription: $request->validated('establishment_description'),
-
-            // Obtiene la dirección validada.
             establishmentAddress:     $request->validated('establishment_address'),
-
-            // Obtiene el correo validado.
             establishmentEmail:       $request->validated('establishment_email'),
-
-            // Obtiene el teléfono validado.
             establishmentPhone:       $request->validated('establishment_phone'),
 
-            // Obtiene el tipo validado.
-            establishmentType:        $request->validated('establishment_type'),
+            // El estado inicial siempre es Activo.
+            status:                   EstablishmentStatus::ACTIVO,
 
-            // Obtiene el estado validado o asigna 1 por defecto.
-            status:                   (int) ($request->validated('status') ?? 1),
-
-            // Obtiene el ID del usuario autenticado que crea el registro.
+            // Obtiene el identificador del usuario autenticado.
             createdBy:                $request->user()?->user_id,
         );
     }

@@ -1,63 +1,78 @@
 <?php
-/**
- * Habilita el tipado estricto para evitar conversiones implícitas de tipos
- * y garantizar un comportamiento más predecible en toda la clase.
- */
+
 declare(strict_types=1);
-/**
- * Define el espacio de nombres de la entidad dentro del módulo Establishments.
- */
 
 namespace App\Modules\Establishments\Domain\Entities;
 
 /**
- * Entidad de dominio que representa un establecimiento dentro del sistema.
+ * Representa un establecimiento dentro del dominio.
  *
- * Responsabilidades:
- * - Modelar la información de un establecimiento.
- * - Actuar como un objeto inmutable del dominio.
- * - No contener lógica relacionada con persistencia, HTTP o infraestructura.
- *
- * Esta entidad es utilizada para transportar información entre las capas
- * de Dominio, Aplicación e Infraestructura respetando los principios de
- * Clean Architecture.
+ * Esta entidad contiene únicamente los datos que describen
+ * un establecimiento y es independiente de Laravel,
+ * de la base de datos y de cualquier tecnología externa.
  */
 final class Establishment
 {
     /**
-     * Crea una nueva instancia inmutable de un establecimiento.
-     *
-     * @param int         $establishmentId        Identificador único del establecimiento.
-     * @param string      $establishmentKey       Clave única del establecimiento.
-     * @param int|null    $parentEstablishmentId  Identificador del establecimiento padre, si existe.
-     * @param string      $establishmentName      Nombre del establecimiento.
-     * @param string|null $establishmentNit       NIT del establecimiento.
-     * @param string|null $establishmentDescription Descripción del establecimiento.
-     * @param string|null $establishmentAddress   Dirección física.
-     * @param string|null $establishmentEmail     Correo electrónico de contacto.
-     * @param string|null $establishmentPhone     Número telefónico de contacto.
-     * @param string|null $establishmentType      Tipo o categoría del establecimiento.
-     * @param int         $status                 Estado actual del registro.
-     * @param int|null    $createdBy              Identificador del usuario que creó el registro.
-     * @param string|null $creationDate           Fecha y hora de creación.
-     * @param int|null    $modifiedBy             Identificador del usuario que realizó la última modificación.
-     * @param string|null $modificationDate       Fecha y hora de la última modificación.
+     * Crea una instancia inmutable de un establecimiento.
      */
     public function __construct(
-        public readonly int     $establishmentId,
-        public readonly string  $establishmentKey,
-        public readonly ?int    $parentEstablishmentId,
-        public readonly string  $establishmentName,
+
+        // Identificador único del establecimiento.
+        public readonly int $establishmentId,
+
+        // Clave única del establecimiento.
+        public readonly string $establishmentKey,
+
+        // Identificador del establecimiento padre (si existe).
+        public readonly ?int $parentEstablishmentId,
+
+        // Nombre del establecimiento.
+        public readonly string $establishmentName,
+
+        // Número de Identificación Tributaria (NIT).
         public readonly ?string $establishmentNit,
+
+        // Descripción del establecimiento.
         public readonly ?string $establishmentDescription,
+
+        // Dirección física del establecimiento.
         public readonly ?string $establishmentAddress,
+
+        // Correo electrónico de contacto.
         public readonly ?string $establishmentEmail,
+
+        // Teléfono de contacto.
         public readonly ?string $establishmentPhone,
-        public readonly ?string $establishmentType,
-        public readonly int     $status,
-        public readonly ?int    $createdBy,
+
+        // Identificador del tipo de establecimiento.
+        public readonly int $establishmentType,
+
+        // Identificador del estado actual.
+        public readonly int $status,
+
+        // Usuario que creó el registro.
+        public readonly ?int $createdBy,
+
+        // Fecha de creación del registro.
         public readonly ?string $creationDate,
-        public readonly ?int    $modifiedBy,
+
+        // Usuario que realizó la última modificación.
+        public readonly ?int $modifiedBy,
+
+        // Fecha de la última modificación.
         public readonly ?string $modificationDate,
+
+        /**
+         * Nombre legible del tipo de establecimiento,
+         * obtenido desde el catálogo sms_typologies.
+         */
+        public readonly ?string $establishmentTypeName = null,
+
+        /**
+         * Nombre legible del estado,
+         * obtenido desde el catálogo sms_typologies.
+         */
+        public readonly ?string $statusName = null,
     ) {}
 }

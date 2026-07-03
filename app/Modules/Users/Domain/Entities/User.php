@@ -56,8 +56,13 @@ final class User
         /** URL de la imagen o fotografía del usuario. */
         public readonly ?string $imageUrl,
 
+        //----------------------------------------------------------------
         /** Estado actual del usuario (activo, inactivo, etc.). */
         public readonly int $status,
+
+        /** Nombre legible del estado, resuelto desde sms_typologies. */
+        public readonly ?string $statusName,
+        //----------------------------------------------------------------
 
         /** Usuario que creó el registro. */
         public readonly ?int $createdBy,
