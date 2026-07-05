@@ -20,6 +20,7 @@ final class EstablishmentsServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        $this->loadMigrationsFrom(__DIR__ . '/../Infrastructure/Database/Migrations');
         $this->loadRoutesFrom(__DIR__ . '/../Presentation/Routes/establishments.php');
     }
 }

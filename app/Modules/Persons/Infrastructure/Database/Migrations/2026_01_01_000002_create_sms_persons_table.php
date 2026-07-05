@@ -34,7 +34,7 @@ return new class extends Migration
             // Contacto
             $table->string('email', 150)->nullable()->unique();
             $table->string('phone_number', 20)->nullable();
-            $table->string('secondary_phone_numer', 20)->nullable();
+            $table->string('secondary_phone_number', 20)->nullable();
             $table->text('address')->nullable();
 
             // 1 = activo, 0 = inactivo

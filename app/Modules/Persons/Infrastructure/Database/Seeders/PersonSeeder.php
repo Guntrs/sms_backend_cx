@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Modules\Users\Infrastructure\Database\Seeders;
+namespace App\Modules\Persons\Infrastructure\Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -27,7 +27,7 @@ class PersonSeeder extends Seeder
             'nit'                   => 'CF',
             'email'                 => 'admin@sms.com',
             'phone_number'          => null,
-            'secondary_phone_numer' => null,
+            'secondary_phone_number' => null,
             'address'               => null,
             'status'                => 1,
             'created_by'            => 0,

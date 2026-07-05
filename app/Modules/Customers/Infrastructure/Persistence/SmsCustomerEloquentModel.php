@@ -7,6 +7,7 @@ namespace App\Modules\Customers\Infrastructure\Persistence;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+
 class SmsCustomerEloquentModel extends Model
 {
     protected $table      = 'sms_customers';
@@ -40,7 +41,7 @@ class SmsCustomerEloquentModel extends Model
     public function person(): BelongsTo
     {
         return $this->belongsTo(
-            \App\Modules\Users\Infrastructure\Persistence\SmsPersonEloquentModel::class,
+            \App\Modules\Persons\Infrastructure\Persistence\SmsPersonEloquentModel::class,
             'person_id',
             'person_id'
         );

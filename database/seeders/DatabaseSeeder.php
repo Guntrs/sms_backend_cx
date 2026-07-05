@@ -8,7 +8,7 @@ use Illuminate\Database\Seeder;
 
 // Seeders de cada módulo en orden de dependencias
 use App\Modules\Typologies\Infrastructure\Database\Seeders\TypologySeeder;
-use App\Modules\Users\Infrastructure\Database\Seeders\PersonSeeder;
+use App\Modules\Persons\Infrastructure\Database\Seeders\PersonSeeder;
 use App\Modules\Establishments\Infrastructure\Database\Seeders\EstablishmentSeeder;
 use App\Modules\Users\Infrastructure\Database\Seeders\UserSeeder;
 use App\Modules\Establishments\Infrastructure\Database\Seeders\UserEstablishmentSeeder;

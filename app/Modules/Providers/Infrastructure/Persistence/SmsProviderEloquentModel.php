@@ -39,7 +39,7 @@ class SmsProviderEloquentModel extends Model
     public function person(): BelongsTo
     {
         return $this->belongsTo(
-            \App\Modules\Users\Infrastructure\Persistence\SmsPersonEloquentModel::class,
+            \App\Modules\Persons\Infrastructure\Persistence\SmsPersonEloquentModel::class,
             'person_id',
             'person_id'
         );
